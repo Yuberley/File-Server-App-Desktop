@@ -20,12 +20,18 @@ public class ThreadPool {
         }
     }
 
-    public void execute(Runnable task) {
-        if (this.isRunning) {
-            synchronized (taskQueue) {
-                taskQueue.add(task);
-                taskQueue.notify();
-            }
+//    public void execute(Runnable task) {
+//        if (this.isRunning) {
+//            synchronized (taskQueue) {
+//                taskQueue.add(task);
+//                taskQueue.notify();
+//            }
+//        }
+//    }
+
+    public void execute(Runnable task) throws InterruptedException {
+        if (isRunning) {
+            taskQueue.put(task);
         }
     }
 

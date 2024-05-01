@@ -1,7 +1,10 @@
 package startup;
 
+import java.io.BufferedInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
@@ -24,6 +27,21 @@ public class Startup {
             IP = InetAddress.getByName(HOST);
             socket = new Socket(IP, PORT);
             System.out.printf("Server started on %s:%d\n", HOST, PORT);
+
+
+            File file = new File("C:\\Users\\yuber\\Desktop\\client-server-architecture\\FileClient\\src\\main\\java\\startup\\information.txt");
+            byte[] buffer = new byte[(int) file.length()];
+            FileInputStream fis = new FileInputStream(file);
+            BufferedInputStream bis = new BufferedInputStream(fis);
+            bis.read(buffer, 0, buffer.length);
+
+            DataOutputStream output = new DataOutputStream(socket.getOutputStream());
+            output.writeUTF(file.getName());
+            output.write(buffer, 0, buffer.length);
+            output.flush();
+            socket.close();
+
+            System.out.println("Archivo enviado al servidor.");
 
 
         } catch (Exception e) {

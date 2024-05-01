@@ -10,50 +10,9 @@ public class HandlerClient implements Runnable {
     private Socket clientSocket;
     private String clientName;
 
-    public HandlerClient(Socket clientSocket, String clientName) {
+    public HandlerClient(Socket clientSocket) {
         this.clientSocket = clientSocket;
-        this.clientName = clientName;
     }
-
-//    @Override
-//    public void run() {
-//        try {
-//            System.out.printf("Client connected: %s\n", clientSocket.getInetAddress().getHostAddress());
-//
-//            // Get the input and output streams
-//            InputStream input = clientSocket.getInputStream();
-//            OutputStream output = clientSocket.getOutputStream();
-//
-//            // Read the file name
-//            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-//            String fileName = reader.readLine();
-//            System.out.printf("File name: %s\n", fileName);
-//
-//            // Read the file size
-//            long fileSize = Long.parseLong(reader.readLine());
-//            System.out.printf("File size: %d\n", fileSize);
-//
-//            // Read the file
-//            byte[] buffer = new byte[1024];
-//            int bytesRead;
-//            FileOutputStream fileOutput = new FileOutputStream("uploads/" + fileName);
-//            while (fileSize > 0 && (bytesRead = input.read(buffer, 0, (int) Math.min(buffer.length, fileSize))) != -1) {
-//                fileOutput.write(buffer, 0, bytesRead);
-//                fileSize -= bytesRead;
-//            }
-//            fileOutput.close();
-//
-//            // Send the response
-//            PrintWriter writer = new PrintWriter(output, true);
-//            writer.println("File uploaded successfully");
-//
-//            // Close the client socket
-//            clientSocket.close();
-//
-//        } catch (Exception e) {
-//            System.out.printf("Error: %s", e.getMessage());
-//        }
-//    }
 
 
     @Override
