@@ -49,35 +49,6 @@ public class FileManager {
     }
 
     /**
-     * Lista todos los archivos en el directorio especificado y devuelve una lista de objetos que representan
-     * el nombre del archivo y su tamaño.
-     * @return List de archivos con sus nombres y tamaños.
-     */
-    public static List<FileData> listFiles() {
-        List<FileData> files = new ArrayList<>();
-        Path dirPath = Paths.get(DIRECTORY_PATH);
-
-        // Comprueba si el directorio existe
-        if (!Files.exists(dirPath) || !Files.isDirectory(dirPath)) {
-            System.out.println("El directorio no existe o no es un directorio.");
-            return files;
-        }
-
-        File directory = dirPath.toFile();
-        File[] fileList = directory.listFiles();
-
-        if (fileList != null) {
-            for (File file : fileList) {
-                if (file.isFile()) {
-                    files.add(new FileData(file.getName(), formatSize(file.length())));
-                }
-            }
-        }
-
-        return files;
-    }
-
-    /**
      * Formatea el tamaño del archivo de bytes a una representación más legible.
      * @param size Tamaño del archivo en bytes.
      * @return Tamaño del archivo formateado como String.
