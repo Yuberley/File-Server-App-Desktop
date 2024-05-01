@@ -1,9 +1,8 @@
 package startup;
 import java.net.Socket;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.util.Base64;
+import org.json.JSONObject;
 
 public class HandlerClient implements Runnable {
 
@@ -14,37 +13,102 @@ public class HandlerClient implements Runnable {
         this.clientSocket = clientSocket;
     }
 
-
     @Override
     public void run() {
-        try {
-            DataInputStream input = new DataInputStream(clientSocket.getInputStream());
-            // Leer el nombre del archivo enviado
-            String fileName = input.readUTF();
+
+
+        try (DataInputStream input = new DataInputStream(clientSocket.getInputStream());
+             DataOutputStream output = new DataOutputStream(clientSocket.getOutputStream())) {
+
+            // Leer la cadena JSON completa desde el cliente
+            String jsonData = input.readUTF();
+            JSONObject jsonObject = new JSONObject(jsonData);
+
+            // Extracción de datos desde el objeto JSON
+            String clientName = jsonObject.getString("cliente");
+            String fileName = jsonObject.getString("fileName");
+            String fileContentBase64 = jsonObject.getString("file");
+
+            System.out.println("Conectado cliente: " + clientName);
+            System.out.println("Recibiendo archivo: " + fileName);
+
+            // Decodificar el contenido del archivo desde Base64
+            byte[] fileData = Base64.getDecoder().decode(fileContentBase64);
+
+            // Escribir el contenido del archivo al sistema de archivos
             File file = new File("server_files/" + fileName);
+            file.getParentFile().mkdirs();  // Asegurarse de que el directorio existe
 
-            // Crear directorio si no existe
-            file.getParentFile().mkdirs();
-
-            // Escribir el contenido del archivo recibido
-            FileOutputStream fileOutput = new FileOutputStream(file);
-            byte[] buffer = new byte[4096];
-            int bytesRead;
-            while ((bytesRead = input.read(buffer)) != -1) {
-                fileOutput.write(buffer, 0, bytesRead);
+            try (FileOutputStream fileOutput = new FileOutputStream(file)) {
+                fileOutput.write(fileData);
             }
-            fileOutput.close();
             System.out.println("Archivo recibido y guardado: " + file.getPath());
+
+            // Enviar confirmación al cliente
+            output.writeUTF("Archivo recibido correctamente");
+
         } catch (IOException e) {
+            System.err.println("IOException en HandlerClient: " + e.getMessage());
             e.printStackTrace();
         } finally {
             try {
-                clientSocket.close();
+                if (!clientSocket.isClosed()) {
+                    clientSocket.close();
+                }
+                System.out.println("Conexión con el cliente cerrada.");
             } catch (IOException e) {
+                System.err.println("Error al cerrar socket: " + e.getMessage());
                 e.printStackTrace();
             }
         }
+
+
+//        try (DataInputStream input = new DataInputStream(clientSocket.getInputStream());
+//             DataOutputStream output = new DataOutputStream(clientSocket.getOutputStream())) {
+//
+//            while (true) {  // Mantener el bucle hasta que el cliente cierre la conexión
+//                try {
+//                    String clientName = input.readUTF();  // Espera recibir el nombre del cliente
+//                    String fileName = input.readUTF();  // Espera recibir el nombre del archivo
+//
+//                    System.out.println("Cliente: " + clientName);
+//                    System.out.println("fileName: " + fileName);
+//
+//                    if (fileName == null) break;  // Salir del bucle si el cliente cerró la conexión ordenadamente
+//
+//                    File file = new File("server_files/" + fileName);
+//                    file.getParentFile().mkdirs();
+//
+//                    try (FileOutputStream fileOutput = new FileOutputStream(file)) {
+//                        byte[] buffer = new byte[4096];
+//                        int bytesRead;
+//                        while ((bytesRead = input.read(buffer)) != -1) {
+//                            fileOutput.write(buffer, 0, bytesRead);
+//                        }
+//                    }
+//                    System.out.println("Archivo recibido y guardado: " + file.getPath());
+//
+//                    // Enviar confirmación al cliente
+//                    output.writeUTF("Archivo recibido correctamente");
+//
+//                } catch (EOFException e) {
+//                    System.out.println("Cliente cerró la conexión: " + clientSocket.getInetAddress().getHostAddress());
+//                    break;  // Salir del bucle y cerrar el socket
+//                }
+//            }
+//        } catch (IOException e) {
+//            System.err.println("IOException en HandlerClient: " + e.getMessage());
+//            e.printStackTrace();
+//        } finally {
+//            try {
+//                if (!clientSocket.isClosed()) {
+//                    clientSocket.close();
+//                }
+//                System.out.println("Conexión con el cliente cerrada.");
+//            } catch (IOException e) {
+//                System.err.println("Error al cerrar socket: " + e.getMessage());
+//                e.printStackTrace();
+//            }
+//        }
     }
-
-
 }
