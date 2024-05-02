@@ -3,22 +3,26 @@ import java.net.Socket;
 import java.io.*;
 import java.util.Base64;
 import org.json.JSONObject;
+import storage.FileManager;
 
 public class HandlerClient implements Runnable {
 
     private Socket clientSocket;
     private String clientName;
+    private FileManager fileManager;
 
     public HandlerClient(Socket clientSocket) {
         this.clientSocket = clientSocket;
+        fileManager = new FileManager();
     }
 
     @Override
     public void run() {
 
-
-        try (DataInputStream input = new DataInputStream(clientSocket.getInputStream());
-             DataOutputStream output = new DataOutputStream(clientSocket.getOutputStream())) {
+        try (
+                DataInputStream input = new DataInputStream(clientSocket.getInputStream());
+                DataOutputStream output = new DataOutputStream(clientSocket.getOutputStream())
+        ) {
 
             // Leer la cadena JSON completa desde el cliente
             String jsonData = input.readUTF();
@@ -29,20 +33,8 @@ public class HandlerClient implements Runnable {
             String fileName = jsonObject.getString("fileName");
             String fileContentBase64 = jsonObject.getString("file");
 
-            System.out.println("Conectado cliente: " + clientName);
-            System.out.println("Recibiendo archivo: " + fileName);
-
-            // Decodificar el contenido del archivo desde Base64
-            byte[] fileData = Base64.getDecoder().decode(fileContentBase64);
-
-            // Escribir el contenido del archivo al sistema de archivos
-            File file = new File("server_files/" + fileName);
-            file.getParentFile().mkdirs();  // Asegurarse de que el directorio existe
-
-            try (FileOutputStream fileOutput = new FileOutputStream(file)) {
-                fileOutput.write(fileData);
-            }
-            System.out.println("Archivo recibido y guardado: " + file.getPath());
+            // Guardar el archivo en el sistema de archivos
+            fileManager.saveFile(fileName, Base64.getDecoder().decode(fileContentBase64));
 
             // Enviar confirmación al cliente
             output.writeUTF("Archivo recibido correctamente");
@@ -54,8 +46,8 @@ public class HandlerClient implements Runnable {
             try {
                 if (!clientSocket.isClosed()) {
                     clientSocket.close();
+                    System.out.println("Conexión con el cliente cerrada.");
                 }
-                System.out.println("Conexión con el cliente cerrada.");
             } catch (IOException e) {
                 System.err.println("Error al cerrar socket: " + e.getMessage());
                 e.printStackTrace();

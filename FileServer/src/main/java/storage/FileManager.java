@@ -48,6 +48,29 @@ public class FileManager {
         return jsonArray.toString();
     }
 
+
+    /**
+     * Guardar un archivo en el directorio especificado.
+     * @param fileName Nombre del archivo.
+     *                 Si el archivo ya existe, se sobrescribirá.
+     *                 Si el nombre del archivo no contiene una extensión, se añadirá ".txt" por defecto.
+     */
+    public static void saveFile(String fileName, byte[] fileData) {
+        if (!fileName.contains(".")) {
+            fileName += ".txt";
+        }
+
+        Path filePath = Paths.get(DIRECTORY_PATH, fileName);
+
+        try {
+            Files.write(filePath, fileData);
+            System.out.println("Archivo guardado: " + filePath);
+        } catch (Exception e) {
+            System.err.println("Error al guardar el archivo: " + e.getMessage());
+        }
+    }
+
+
     /**
      * Formatea el tamaño del archivo de bytes a una representación más legible.
      * @param size Tamaño del archivo en bytes.
