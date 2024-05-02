@@ -3,6 +3,7 @@ package views;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import startup.Document;
 
 public class clientsactions {
     private JPanel ventana;
@@ -20,6 +21,11 @@ public class clientsactions {
                 if (response == JFileChooser.APPROVE_OPTION) {
                     java.io.File selectedFile = fileChooser.getSelectedFile();
                     JOptionPane.showMessageDialog(null, "Archivo seleccionado: " + selectedFile.getAbsolutePath());
+                    try {
+                        Document.upload(selectedFile.getAbsolutePath());
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                    }
                 }
             }
         });
