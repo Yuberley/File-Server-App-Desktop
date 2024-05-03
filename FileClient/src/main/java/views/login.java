@@ -41,7 +41,7 @@ public class login {
                 return;
             }
             Socket socket = new Socket(host, port);
-            socket.close();
+//            socket.close();
             JOptionPane.showMessageDialog(null, "Conexión establecida exitosamente.");
             frame.dispose();
             clientsactions.main(new String[]{host, portString});

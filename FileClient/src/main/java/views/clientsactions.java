@@ -4,12 +4,16 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import startup.Document;
+import startup.ListFiles;
 
 public class clientsactions {
     private JPanel ventana;
-    private JTabbedPane tabbedPane1;
-    private JTabbedPane tabbedPane2;
     private JButton añadirArchivoButton;
+    private JTextArea listar;
+    private JButton archivos;
+    private JButton obtenerArchivoButton;
+    private JTextField textField1;
+    private JButton listarClientesButton;
 
     public clientsactions() {
         añadirArchivoButton.addActionListener(new ActionListener() {
@@ -26,6 +30,31 @@ public class clientsactions {
                     } catch (Exception exception) {
                         exception.printStackTrace();
                     }
+                }
+            }
+        });
+
+        archivos.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    System.out.println("Listando archivos...");
+                    String filesList = ListFiles.listFiles();
+                    listar.setText(filesList);
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+            }
+        });
+
+        obtenerArchivoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String fileName = textField1.getText().trim();
+                try {
+                    Document.getDocuments(fileName);
+                } catch (Exception exception) {
+                    exception.printStackTrace();
                 }
             }
         });

@@ -24,20 +24,30 @@ public class HandlerClient implements Runnable {
                 DataOutputStream output = new DataOutputStream(clientSocket.getOutputStream())
         ) {
 
-            // Leer la cadena JSON completa desde el cliente
             String jsonData = input.readUTF();
             JSONObject jsonObject = new JSONObject(jsonData);
 
-            // Extracción de datos desde el objeto JSON
-            String clientName = jsonObject.getString("cliente");
-            String fileName = jsonObject.getString("fileName");
-            String fileContentBase64 = jsonObject.getString("file");
+            String accion = jsonObject.getString("accion");
 
-            // Guardar el archivo en el sistema de archivos
-            fileManager.saveFile(fileName, Base64.getDecoder().decode(fileContentBase64));
+            if (accion.equals("archivo")) {
+                String fileName = jsonObject.getString("fileName");
+                String fileContentBase64 = jsonObject.getString("file");
 
-            // Enviar confirmación al cliente
-            output.writeUTF("Archivo recibido correctamente");
+                fileManager.saveFile(fileName, Base64.getDecoder().decode(fileContentBase64));
+
+                output.writeUTF("Archivo recibido correctamente");
+            }
+            if (accion.equals("listararchivo")) {
+                String filesList = fileManager.listFilesAsJson();
+                output.writeUTF(filesList);
+            }
+            if (accion.equals("descargararchivo")) {
+                String fileName = jsonObject.getString("fileName");
+                JSONObject getFile = FileManager.sendFile(fileName);
+
+                output.writeUTF(getFile.toString());
+            }
+
 
         } catch (IOException e) {
             System.err.println("IOException en HandlerClient: " + e.getMessage());

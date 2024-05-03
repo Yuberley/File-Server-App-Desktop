@@ -1,10 +1,12 @@
 package storage;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -39,14 +41,30 @@ public class FileManager {
             for (File file : fileList) {
                 if (file.isFile()) {
                     JSONObject fileObj = new JSONObject();
-                    fileObj.put("file", file.getName());
+                    fileObj.put("filename", file.getName());
                     fileObj.put("size", formatSize(file.length()));
+                    fileObj.put("extension", file.getName().substring(file.getName().lastIndexOf(".") + 1));
                     jsonArray.put(fileObj);
                 }
             }
         }
 
         return jsonArray.toString();
+    }
+
+    public static JSONObject sendFile(String fileName) throws IOException {
+        Path filePath = Paths.get(DIRECTORY_PATH, fileName);
+        JSONObject fileObj = new JSONObject();
+        if (!Files.exists(filePath)) {
+            fileObj.put("error", "El archivo no existe.");
+            return fileObj;
+        }
+        byte[] fileData = Files.readAllBytes(filePath);
+        String encodedFile = Base64.getEncoder().encodeToString(fileData);
+
+        fileObj.put("filename", fileName);
+        fileObj.put("file", encodedFile); // Ahora 'file' es una cadena codificada en Base64
+        return fileObj;
     }
 
 
