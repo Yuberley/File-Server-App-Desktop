@@ -7,14 +7,13 @@ import java.net.UnknownHostException;
 
 public class ConnectionServer {
 
-    public Socket start() throws UnknownHostException, IOException {
-        String HOST = "127.0.0.1"; // IP del servidor
-        int PORT = 9090; // Puerto del servidor
+    public static Socket start(String HOST, String PORT) throws UnknownHostException, IOException {
+        int port = Integer.parseInt(PORT);
 
-        System.out.printf("Conectando al servidor en %s:%d\n", HOST, PORT);
+        System.out.printf("Conectando al servidor en %s:%d\n", HOST, port);
 
         InetAddress IP = InetAddress.getByName(HOST);
-        Socket socket = new Socket(IP, PORT);
+        Socket socket = new Socket(IP, port);
 
         System.out.println("Conexión establecida");
 

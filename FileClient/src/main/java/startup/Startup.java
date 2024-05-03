@@ -9,6 +9,5 @@ import views.login;
 public class Startup {
     public static void main(String[] args) {
             login.main(args);
-
     }
 }

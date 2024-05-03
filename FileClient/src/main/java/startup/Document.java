@@ -3,12 +3,14 @@ package startup;
 import org.json.JSONObject;
 
 import java.io.*;
-import java.net.Socket;
 import java.util.Base64;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 
 public class Document {
 
-    public static void upload(String path) throws IOException {
+    public static void upload(String path, DataInputStream input, DataOutputStream output) throws IOException {
+
         System.out.println("Subiendo documento: " + path);
 
         File file = new File(path);
@@ -25,27 +27,19 @@ public class Document {
         json.put("fileName", file.getName());
         json.put("file", encodedContent);
 
-        Socket socket;
+        output.writeUTF(json.toString());
+        output.flush();
 
-        // Conectar con el servidor y enviar el JSON
-        ConnectionServer connectionServer = new ConnectionServer();
-        socket = connectionServer.start();
-        DataOutputStream output = new DataOutputStream(socket.getOutputStream());
-        DataInputStream input = new DataInputStream(socket.getInputStream());
+        // Leer la respuesta del servidor
+        String response = input.readUTF();
+        System.out.println("Respuesta del servidor: " + response);
 
-            output.writeUTF(json.toString());
-            output.flush();
-
-            // Leer la respuesta del servidor
-            String response = input.readUTF();
-            System.out.println("Respuesta del servidor: " + response);
-
-            System.out.println("Datos JSON enviados al servidor.");
+        System.out.println("Datos JSON enviados al servidor.");
 
 
     }
 
-    public static void getDocuments(String nameFile) throws IOException {
+    public static void getDocuments(String nameFile, DataInputStream input, DataOutputStream output) throws IOException {
         System.out.println("Listando archivos en el servidor");
 
         // Crear objeto JSON para enviar
@@ -53,13 +47,6 @@ public class Document {
         json.put("accion", "descargararchivo");
         json.put("fileName", nameFile);
 
-        Socket socket;
-
-        // Conectar con el servidor y enviar el JSON
-        ConnectionServer connectionServer = new ConnectionServer();
-        socket = connectionServer.start();
-        DataOutputStream output = new DataOutputStream(socket.getOutputStream());
-        DataInputStream input = new DataInputStream(socket.getInputStream());
 
         output.writeUTF(json.toString());
         output.flush();

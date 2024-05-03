@@ -8,20 +8,16 @@ import org.json.JSONArray;
 
 public class ListFiles {
 
-    public static String listFiles() throws IOException {
+    public static String listFiles(DataInputStream input, DataOutputStream output) throws IOException {
         System.out.println("Listando archivos en el servidor");
+
+        System.out.println(input);
+        System.out.println(output);
 
         // Crear objeto JSON para enviar
         JSONObject json = new JSONObject();
         json.put("accion", "listararchivo");
 
-        Socket socket;
-
-        // Conectar con el servidor y enviar el JSON
-        ConnectionServer connectionServer = new ConnectionServer();
-        socket = connectionServer.start();
-        DataOutputStream output = new DataOutputStream(socket.getOutputStream());
-        DataInputStream input = new DataInputStream(socket.getInputStream());
 
         output.writeUTF(json.toString());
         output.flush();
@@ -35,6 +31,7 @@ public class ListFiles {
             JSONObject item = jsonArray.getJSONObject(i); // Trata cada elemento como un JSONObject
             sb.append(item.toString()).append("\n"); // Puedes cambiar esto para manejar los datos del objeto como necesites
         }
+
         return sb.toString();
     }
 

@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import views.clientsactions;
+import startup.ConnectionServer;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 
 public class login {
     private JTextField textField2; // IP Address
@@ -40,11 +43,18 @@ public class login {
                 JOptionPane.showMessageDialog(null, "Error: El puerto debe estar entre 1 y 65535.");
                 return;
             }
-            Socket socket = new Socket(host, port);
-//            socket.close();
+            Socket socket = ConnectionServer.start(host, portString);
+            DataOutputStream output = new DataOutputStream(socket.getOutputStream());
+            DataInputStream input = new DataInputStream(socket.getInputStream());
+
+
             JOptionPane.showMessageDialog(null, "Conexión establecida exitosamente.");
             frame.dispose();
-            clientsactions.main(new String[]{host, portString});
+            clientsactions clients = new clientsactions();
+            clients.setSocket(socket);
+            clients.setInput(input);
+            clients.setOutput(output);
+            clients.main(new String[]{host, portString});
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "Error: El puerto debe ser un número entero.");
         } catch (UnknownHostException e) {
